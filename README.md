@@ -1,4 +1,3 @@
-# owfmodules.skeleton
-Module base repository
+# owfmodules.uart.baudrate_analyzer
 
-Please read [CONTRIBUTING.md](https://github.com/immunIT/octowire-framework/blob/master/CONTRIBUTING.md) to follow the contribution process.
+Show received characters with calculated entropy for different baudrate values. 

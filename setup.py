@@ -4,14 +4,14 @@
 
 from setuptools import setup, find_packages
 
-__authors__ = ""
-__copyright__ = ""
+__authors__ = "Jordan Ovrè, Paul Duncan"
+__copyright__ = "Copyright (c) ImmunIT - Jordan Ovrè / Paul Duncan"
 __license__ = "Apache 2.0"
 __version__ = "1.0.0"
-__contact__ = ""
+__contact__ = "Jordan Ovrè / Ghecko <jovre@immunit.ch>, Paul Duncan / Eresse <pduncan@immunit.ch>"
 
-description = ''
-name = 'owfmodules.<category>.<module_name>'
+description = 'Show characters received with calculated entropy for different baudrate values.'
+name = 'owfmodules.uart.baudrate_analyzer'
 
 setup(
     name=name,
@@ -27,5 +27,5 @@ setup(
         'Programming Language :: Python :: 3',
         'Development Status :: 5 - Production/Stable'
     ],
-    keywords=['octowire', 'framework', 'hardware', 'security']
+    keywords=['octowire', 'framework', 'hardware', 'security', 'uart', 'baudrate', 'analyzer']
 )
