@@ -10,7 +10,7 @@ __license__ = "Apache 2.0"
 __version__ = "1.0.0"
 __contact__ = "Jordan Ovrè / Ghecko <jovre@immunit.ch>, Paul Duncan / Eresse <pduncan@immunit.ch>"
 
-description = 'Show characters received with calculated entropy for different baudrate values.'
+description = 'Show characters received on UART with calculated entropy for different baudrate values.'
 name = 'owfmodules.uart.baudrate_analyzer'
 
 setup(

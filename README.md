@@ -1,3 +1,3 @@
 # owfmodules.uart.baudrate_analyzer
 
-Show received characters with calculated entropy for different baudrate values. 
+Show characters received on UART with calculated entropy for different baudrate values. 

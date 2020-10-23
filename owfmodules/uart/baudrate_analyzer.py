@@ -15,20 +15,20 @@ from octowire.uart import UART
 from octowire.gpio import GPIO
 
 
-class Baudrate(AModule):
+class BaudrateAnalyzer(AModule):
     def __init__(self, owf_config):
-        super(Baudrate, self).__init__(owf_config)
+        super(BaudrateAnalyzer, self).__init__(owf_config)
         self.meta.update({
             'name': 'UART baudrate analyzer',
             'version': '1.0.0',
-            'description': 'Show characters received with calculated entropy for different baudrate values.',
+            'description': 'Show characters received on UART with calculated entropy for different baudrate values.',
             'author': 'Jordan Ovrè / Ghecko <jovre@immunit.ch>, Paul Duncan / Eresse <pduncan@immunit.ch>'
         })
         self.options = {
             "uart_interface": {"Value": "", "Required": True, "Type": "int",
                                "Description": "UART interface (0=UART0 or 1=UART1)", "Default": 0},
             "mode": {"Value": "", "Required": True, "Type": "text",
-                     "Description": "Method used to perform baudrate detection. See advanced options for details\nIn "
+                     "Description": "Method used to perform baudrate detection - see advanced options for details.\nIn "
                                     "'incremental' mode, the baudrate starts at 'baudrate_min' and is incremented by "
                                     "'baudrate_inc' up to 'baudrate_max'.\nIn the 'list' mode, all values "
                                     "defined in 'baudrate_list' will be tested.\nAcceptable values: 'list' & "
@@ -41,13 +41,13 @@ class Baudrate(AModule):
                           "Default": ""},
             "trigger": {"Value": "", "Required": True, "Type": "bool",
                         "Description": "When true, send the character(s) defined in 'trigger_char' (see advanced "
-                                       "options) if the Octowire does not receive anything from the target",
+                                       "options) if the Octowire does not receive anything from the target.",
                         "Default": False}
         }
         self.advanced_options.update({
             "reset_pol": {"Value": "", "Required": True, "Type": "text",
-                          "Description": "The polarity of the reset line to reset the target. "
-                                         "Acceptable values: 'low' (active-low) & 'high'",
+                          "Description": "The polarity of the reset line to cause a reset on the target. "
+                                         "Acceptable values: 'low' (active-low) & 'high'.",
                           "Default": "low"},
             "reset_hold": {"Value": "", "Required": True, "Type": "float",
                            "Description": "Hold time required to perform a target reset (in seconds).",
@@ -56,7 +56,7 @@ class Baudrate(AModule):
                             "Description": "Time to wait after a target reset.",
                             "Default": 0.5},
             "min_entropy": {"Value": "", "Required": False, "Type": "float",
-                            "Description": "Minimal entropy value (float). Only baudrate with an entropy greater than "
+                            "Description": "Minimal entropy value (float). Only baudrates with an entropy greater than "
                                            "this value will be printed. If unset, print the result for all baudrate "
                                            "values.",
                             "Default": ""},
@@ -84,7 +84,7 @@ class Baudrate(AModule):
 
     def check_options(self):
         """
-        Check the user's defined options.
+        Check the user defined options.
         :return: Bool.
         """
         # If reset_pin is set and reset_pol invalid
@@ -112,7 +112,7 @@ class Baudrate(AModule):
 
     def wait_bytes(self):
         """
-        Wait until receiving a bytes (for 1 seconds) from the target.
+        Wait until receiving a byte (for 1 seconds) from the target.
         :return: Bool.
         """
         timeout = 1
@@ -127,7 +127,7 @@ class Baudrate(AModule):
     def change_baudrate(self, baudrate):
         """
         This function changes the baudrate for the target device.
-        :param baudrate: Baudrate dictionary (decimal and hexadecimal value)
+        :param baudrate: Baudrate value
         :return: Bool.
         """
         try:
@@ -144,8 +144,8 @@ class Baudrate(AModule):
 
     def trigger_device(self):
         """
-        Send a character(s) defined by the "trigger_char" advanced option.
-        This method is called whn no byte was receive during the baudrate detection.
+        Send character(s) defined by the "trigger_char" advanced option.
+        This method is called when no data was receive during the baudrate detection.
         :return: Nothing.
         """
         self.logger.handle("Triggering the device", self.logger.INFO)
@@ -155,8 +155,8 @@ class Baudrate(AModule):
     @staticmethod
     def bytearray_to_hex_repr(b_buff):
         """
-        Convert a bytearray to hex representation string.
-        :param b_buff: Bytearray of received bytes from the uart interface.
+        Convert a bytearray to hex representation (string).
+        :param b_buff: Bytearray of received bytes from the UART interface.
         :return: String.
         """
         h_string = ""
@@ -167,8 +167,8 @@ class Baudrate(AModule):
     @staticmethod
     def entropy(b_buff):
         """
-        Calculate the entropy of the bytearray.
-        :param b_buff: Bytearray of received bytes from the uart interface.
+        Calculate the entropy of a bytearray.
+        :param b_buff: Bytearray of received bytes from the UART interface.
         :return:
         """
         p, lns = Counter(b_buff), float(len(b_buff))
@@ -178,7 +178,7 @@ class Baudrate(AModule):
         """
         Print the result for a given baudrate.
         :param baudrate: the current baudrate.
-        :param b_buff: Bytearray of received bytes from the uart interface.
+        :param b_buff: Bytearray of received bytes from the UART interface.
         :param entropy: The calculated entropy of the received bytes.
         :return: Nothing.
         """
@@ -188,7 +188,7 @@ class Baudrate(AModule):
 
     def process_baudrate(self, baudrate):
         """
-        The main function. Change the baudrate and check if bytes received on the RX pin are valid characters.
+        Change the baudrate and check if bytes received on the RX pin are valid characters.
         10 characters are required to calculate the entropy and identify the correct baudrate value.
         :return: Bool.
         """
@@ -224,7 +224,7 @@ class Baudrate(AModule):
                                    "value: {}...".format(baudrate), self.logger.WARNING)
                 return False
         # Calculate the entropy of the received bytes and print the result
-        # If entropy is set, only print result with an entropy greater or equal than the value set by the user.
+        # If min_entropy is set, only print result with an entropy greater or equal than the value set by the user.
         entropy = self.entropy(received_bytes)
         if self.advanced_options["min_entropy"]["Value"] != "":
             if entropy >= self.advanced_options["min_entropy"]["Value"]:
@@ -258,7 +258,7 @@ class Baudrate(AModule):
         # Set and configure UART interface
         self.uart_instance = UART(serial_instance=self.owf_serial, interface_id=self.options["uart_interface"]["Value"])
 
-        # Ensure reset_pin is set to None before initialized it if needed
+        # Ensure reset_pin is clear
         self.reset_pin = None
         # Configure the reset line if defined
         if self.options["reset_pin"]["Value"] != "":
@@ -271,7 +271,7 @@ class Baudrate(AModule):
 
     def incremental_mode(self):
         """
-        Check for valid baudrate using the incremental mode.
+        Check for valid baudrates using the incremental mode.
         :return: Nothing.
         """
         for baudrate in range(self.advanced_options["baudrate_min"]["Value"],
@@ -280,19 +280,19 @@ class Baudrate(AModule):
             if self.change_baudrate(baudrate=baudrate):
                 self.reset_target()
                 if self.process_baudrate(baudrate=baudrate):
-                    # Stop the for loop if valid baudrate is found
+                    # Stop the loop if valid baudrate is found
                     break
 
     def list_mode(self):
         """
-        Check for valid baudrate using the list mode.
+        Check for valid baudrates using the list mode.
         :return: Nothing.
         """
         for baudrate in [int(b.strip()) for b in self.advanced_options["baudrate_list"]["Value"].split(",")]:
             if self.change_baudrate(baudrate=baudrate):
                 self.reset_target()
                 if self.process_baudrate(baudrate=baudrate):
-                    # Stop the for loop if valid baudrate is found
+                    # Stop the loop if valid baudrate is found
                     break
 
     def run(self):
@@ -309,7 +309,7 @@ class Baudrate(AModule):
         try:
             if self.check_options():
                 self.init()
-                self.logger.handle("Starting baudrate detection, turn on your serial device now", self.logger.HEADER)
+                self.logger.handle("Starting baudrate detection, turn on your target device now", self.logger.HEADER)
                 self.logger.handle("Press Ctrl+C to cancel", self.logger.HEADER)
                 if self.options["mode"]["Value"].upper() == "INCREMENTAL":
                     self.incremental_mode()
